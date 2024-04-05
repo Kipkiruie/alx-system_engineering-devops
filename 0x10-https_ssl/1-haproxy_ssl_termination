@@ -2,7 +2,7 @@ global
 	log /dev/log	local0
 	log /dev/log	local1 notice
 	chroot /var/lib/haproxy
-	stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+	stats socket /run/haproxy/admin.sock mode 660 level admin
 	stats timeout 30s
 	user haproxy
 	group haproxy
@@ -33,18 +33,18 @@ defaults
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
 
-backend web-server
-	balance roundrobin
-        redirect scheme https if !{ ssl_fc }
-	server 275-web-01 54.89.65.16:80 check
-	server 275-web-02 100.25.12.44:80 check
+frontend  elisha-frontend-http
+        bind *:80
+        mode http
+	http-request set-header X-Forwarded-Proto http
+        default_backend ehoneah-backend
 
-frontend www-http
-	 bind *:80
-	 http-request set-header X-Forwarded-Proto http
-	 default_backend web-server
+frontend elisha-frontend-https
+	bind *:443 ssl crt /etc/haproxy/certs/www.ehoneah.tech.pem
+	http-request set-header X-Forwarded-Proto https
+	default_backend ehoneah-backend
 
-frontend www-https
-	 bind *:443 ssl crt /etc/ssl/www.cheerpython.tech.pem crt /etc/ssl/lb-01.cheerpython.tech.pem
-	 http-request set-header X-Forwarded-Proto https
-	 default_backend web-server
+backend elisha-backend
+        balance roundrobin
+        server 250717-web-01 54.89.65.16:80 check
+        server 250717-web-02 100.25.12.44:80 check
