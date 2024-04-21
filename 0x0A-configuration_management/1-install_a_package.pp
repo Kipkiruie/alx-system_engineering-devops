@@ -1,5 +1,6 @@
-# Executes a bash command
-exec { 'kill':
-  command => 'pkill -f killmenow',
-  path    => ['/usr/bin', '/usr/sbin']
+# Puppet code to install a package puppet-lint
+
+package { 'puppet-lint':
+  ensure   => '2.1.1',
+  provider => 'gem'
 }
