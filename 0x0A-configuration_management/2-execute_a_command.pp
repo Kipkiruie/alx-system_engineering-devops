@@ -9,3 +9,4 @@ notify { 'Command executed successfully':
   subscribe => Exec['kill'], # This notifies the 'notify' resource when the 'exec' resource is executed successfully.
 }
 
+g
