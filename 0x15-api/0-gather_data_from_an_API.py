@@ -10,13 +10,13 @@ def get_employee_info(employee_id):
         employee_url = f"{base_url}/{employee_id}"
 
         response = requests.get(employee_url)
-        response.raise_for_status()  # Raise an exception for bad response
+        response.raise_for_status()
         employee_data = response.json()
         employee_name = employee_data.get('name')
 
         todo_url = f"{employee_url}/todos"
         response = requests.get(todo_url)
-        response.raise_for_status()  # Raise an exception for bad response
+        response.raise_for_status()
         tasks = response.json()
 
         done_tasks = [task for task in tasks if task.get('completed')]
