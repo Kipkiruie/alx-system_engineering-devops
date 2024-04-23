@@ -1,48 +1,29 @@
 #!/usr/bin/python3
+"""Accessing a REST API for todo lists of employees"""
 
-'''
-    Exports data from an API and stores as a JSON    file.
-'''
+import json
+import requests
+import sys
 
-if __name__ == "__main__":
-    import json
-    from requests import get
-    from sys import argv, exit
 
-    try:
-        id = argv[1]
-        checkType = int(id)
-    except Exception:
-        exit()
+if __name__ == '__main__':
+    employeeId = sys.argv[1]
+    baseUrl = "https://jsonplaceholder.typicode.com/users"
+    url = baseUrl + "/" + employeeId
 
-    User = "https://jsonplaceholder.typicode.com/users?id={}".format(id)
-    Todo = "https://jsonplaceholder.typicode.com/todos?userId={}".format(id)
+    response = requests.get(url)
+    username = response.json().get('username')
 
-    user = get(User)
-    todo = get(Todo)
+    todoUrl = url + "/todos"
+    response = requests.get(todoUrl)
+    tasks = response.json()
 
-    try:
-        Employee = user.json()
-        Tasks = todo.json()
-    except ValueError:
-        print("Not a valid JSON.")
-
-    if Employee and Tasks:
-        EmployeeID = id
-        EmployeeName = Employee[0].get("username")
-
-        jsonList = []
-        for task in Tasks:
-            TaskStatus = task.get("completed")
-            TaskTitle = task.get("title")
-
-            dictInfo = {
-                "task": TaskTitle,
-                "completed": TaskStatus,
-                "username": EmployeeName
-            }
-            jsonList.append(dictInfo)
-        data = {EmployeeID: jsonList}
-
-        with open("{}.json".format(id), "w", newline='') as jsonfile:
-            json.dump(data, jsonfile)
+    dictionary = {employeeId: []}
+    for task in tasks:
+        dictionary[employeeId].append({
+            "task": task.get('title'),
+            "completed": task.get('completed'),
+            "username": username
+        })
+    with open('{}.json'.format(employeeId), 'w') as filename:
+        json.dump(dictionary, filename)
